@@ -1,84 +1,105 @@
-import { VuexModule, Module, Mutation, Action, config, getModule} from 'vuex-module-decorators';
-import { UserAuth, RegisterResponse, LoginResponse, Token} from '../models';
-import store from '@/store';
+import {
+  VuexModule,
+  Module,
+  Mutation,
+  Action,
+  config,
+  getModule,
+} from "vuex-module-decorators";
+import { UserAuth, RegisterResponse, LoginResponse, Token } from "../models";
+import store from "@/store";
 
 config.rawError = true;
 @Module({
   namespaced: true,
   dynamic: true,
   store,
-  name: 'users'
+  name: "users",
 })
 class UserStore extends VuexModule {
-  user: UserAuth | null = null ;
+  user: UserAuth | null = null;
   token: Token | null = null;
 
   get User() {
     return this.user;
   }
-  
+
   get Token() {
     return this.token;
   }
-  
+
   @Mutation
   setUser(user: UserAuth) {
     this.user = user;
   }
 
-  @Action({commit: 'setUser'})
+  @Action({ commit: "setUser" })
   async register(user: UserAuth) {
     const data = {
       email: user.email,
       password: user.password,
-    }
+    };
+
     const requestOptions: RequestInit = {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
       headers: {
+        "Access-Control-Request-Method": "POST",
         "Content-type": "application/json",
-      }
-    }
-    
-    const response = await fetch(process.env.ROOT_API + '/user', requestOptions);
+      },
+    };
+
+    const response = await fetch(
+      "http://localhost:8000/v1/user",
+      requestOptions
+    );
     if (response.status == 201) {
       const res: RegisterResponse = await response.json();
       return res;
-    }else{
-      console.error(response.text);
-      return null;
+    } else {
+      const txt = await response.text();
+      const msg: RegisterResponse = { email: "", id: "", error: txt };
+      return msg;
     }
   }
 
-  @Action({commit: 'setUser'})
+  @Action({ commit: "setUser" })
   async login(user: UserAuth) {
     const data = {
       email: user.email,
       password: user.password,
-    }
+    };
 
     const requestOptions: RequestInit = {
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'same-origin',
+      method: "POST",
       headers: {
+        "Access-Control-Request-Method": "POST",
         "Content-type": "application/json",
-        "Authorization": "Basic " + btoa(data.email + ":" + data.password),
-      }
-    }
-    console.log(requestOptions);
-    const response = await fetch("http://localhost:8000/v1/login", requestOptions);    
+        Authorization: "Basic " + btoa(data.email + ":" + data.password),
+      },
+    };
+
+    const response = await fetch(
+      "http://localhost:8000/v1/login",
+      requestOptions
+    );
     if (response.ok) {
       const res: LoginResponse = await response.json();
-      console.log(res);
       return res;
-    }else{
-      console.error(response.text);
-      return null;
+    } else {
+      const txt = await response.text();
+      const msg: LoginResponse = {
+        email: "",
+        name: "",
+        value: "",
+        expires: "",
+        error: txt,
+      };
+      return msg;
     }
-  }  
+  }
 
-  @Action({commit: 'setUser'})
+  @Action({ commit: "setUser" })
   async logout() {
     return null;
   }
