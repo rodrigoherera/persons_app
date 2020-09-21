@@ -62,9 +62,9 @@ export default class Auth extends Vue {
       const ret = await users.login(user);
 
       if (ret.error != "") {
-        console.error(ret);
         this.registerError = String(ret.error);
       } else {
+        //TODO - pushear a main page
         console.log("Login correcto");
       }
     } else {
@@ -77,10 +77,23 @@ export default class Auth extends Vue {
       const ret = await users.register(user);
 
       if (ret.error != "") {
-        console.error(ret);
         this.registerError = String(ret.error);
       } else {
-        console.log("register correcto");
+        if (ret.id != "") {
+          const userLogin: UserAuth = {
+            email: this.email,
+            password: this.password,
+          };
+          const ret = await users.login(userLogin);
+          if (ret.error != "") {
+            this.registerError = String(ret.error);
+          } else {
+            //TODO - pushear a main page
+            console.log("Login correcto");
+          }
+        } else {
+          this.registerError = "Unexpected error";
+        }
       }
     } else {
       console.log("Faltan argumentos");

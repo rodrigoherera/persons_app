@@ -53,8 +53,10 @@ class UserStore extends VuexModule {
       "http://localhost:8000/v1/user",
       requestOptions
     );
+
     if (response.status == 201) {
       const res: RegisterResponse = await response.json();
+      res.error = "";
       return res;
     } else {
       const txt = await response.text();
@@ -85,6 +87,7 @@ class UserStore extends VuexModule {
     );
     if (response.ok) {
       const res: LoginResponse = await response.json();
+      res.error = "";
       return res;
     } else {
       const txt = await response.text();
