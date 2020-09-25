@@ -45,6 +45,7 @@ import Vue from "vue";
 import { Component } from "vue-property-decorator";
 import users from "@/store/modules/User";
 import { UserAuth } from "@/store/models";
+import VueInsProgressBar from 'vue-ins-progress-bar';
 
 @Component({
   name: "Auth",
@@ -55,21 +56,26 @@ export default class Auth extends Vue {
   password = "";
   loginError = "";
   registerError = "";
+  isLoading = false;
 
   async login() {
-    if (this.email != "" || this.password != "") {
+    this.isLoading = true;
+    // simulate AJAX
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 5000);
+    /*     if (this.email != "" || this.password != "") {
       const user: UserAuth = { email: this.email, password: this.password };
       const ret = await users.login(user);
 
       if (ret.error != "") {
         this.registerError = String(ret.error);
       } else {
-        //TODO - pushear a main page
-        console.log("Login correcto");
+        this.$router.push("/main");
       }
     } else {
       console.log("Faltan argumentos");
-    }
+    } */
   }
   async register() {
     if (this.email != "" || this.password != "") {
@@ -88,8 +94,7 @@ export default class Auth extends Vue {
           if (ret.error != "") {
             this.registerError = String(ret.error);
           } else {
-            //TODO - pushear a main page
-            console.log("Login correcto");
+            this.$router.push("/main");
           }
         } else {
           this.registerError = "Unexpected error";
